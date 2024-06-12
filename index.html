@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сlock-canvas</title>
+    <style>
+        div {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <canvas id="clock" width="700" height="700"></canvas>
+    </div>
+    <script>
+        const drawClock = function() {
+            const canvasClock = document.getElementById("clock");
+
+            if (canvasClock && canvasClock.getContext("2d")) {
+                let ctx = canvasClock.getContext("2d");
+
+                const drawClockFace = function() {
+
+                    ctx.fillStyle = "#FFE4B5";
+                    ctx.strokeStyle = "#FFE4B5";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(350, 350, 340, 0, 2*Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    let value = 1;
+                    let radius = 290;
+
+                    for (let angle = 30; angle <= 360; angle += 30) {
+                        let  angleRadians = angle/180*Math.PI;
+                        let arcForNumberCenterX = 350+radius*Math.sin(angleRadians);
+                        let arcForNumberCenterY = 350-radius*Math.cos(angleRadians);
+                        ctx.fillStyle = "rgb(80, 230, 165)";
+                        ctx.strokeStyle = "rgb(80, 230, 165)";
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(arcForNumberCenterX, arcForNumberCenterY, 40, 0, 2*Math.PI);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.font = "58px Arial";
+                        ctx.fillStyle = "rgb(82, 74, 74)";
+                        if (value < 10) {
+                            ctx.fillText(value, arcForNumberCenterX-16, arcForNumberCenterY+20);
+                        } else {
+                            ctx.fillText(value, arcForNumberCenterX-34, arcForNumberCenterY+20);
+                        }
+
+                        value += 1; 
+                    }
+                }
+
+                let seconds = new Date().getSeconds();
+                let minutes = new Date().getMinutes();
+                let hours = new Date().getHours();
+                
+                if (hours > 12) {
+                    hours = hours-12;
+                }
+
+                let hoursWithMinutes = hours + minutes/60;
+                let deltaSec = seconds*6-90;
+                let deltaMin = minutes*6-90;
+                let deltaHour = hoursWithMinutes*30-90;
+
+                const startClock = function() {
+                    drawClockFace();
+                    ctx.strokeStyle = "rgb(82, 74, 74)";
+                    ctx.lineCap = "round";
+
+                    ctx.translate(350, 350);
+                    ctx.rotate(deltaSec*(Math.PI/180));
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(-10, 0);
+                    ctx.lineTo(270, 0);
+                    ctx.stroke();
+                    ctx.resetTransform();
+
+                    ctx.translate(350, 350);
+                    ctx.rotate(deltaMin*(Math.PI/180));
+                    ctx.lineWidth = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(-10, 0);
+                    ctx.lineTo(240, 0);
+                    ctx.stroke();
+                    ctx.resetTransform();
+
+                    ctx.translate(350, 350);
+                    ctx.rotate(deltaHour*(Math.PI/180));
+                    ctx.lineWidth = 14;
+                    ctx.beginPath();
+                    ctx.moveTo(-10, 0);
+                    ctx.lineTo(210, 0);
+                    ctx.stroke();
+                    ctx.resetTransform();
+
+                    deltaSec += 6;
+                    deltaMin += 0.1;
+                    deltaHour += 0.0016667;
+                    if (deltaSec == 360) {
+                        deltaSec = 0
+                    }
+                    if (deltaMin == 360) {
+                        deltaMin = 0
+                    }
+                    if (deltaHour == 360) {
+                        deltaHour = 0
+                    }
+
+                    ctx.font = "30px, Arial";
+                    ctx.fillStyle = "black";
+                    ctx.fillText(`${hours < 10 ? `0${hours}` : hours} : ${minutes < 10 ? `0${minutes}` : minutes} : ${seconds < 10 ? `0${seconds}` : seconds}`, 210, 210);
+                    
+                    seconds += 1;
+
+                    if (seconds > 59) {
+                        seconds = 0;
+                        minutes += 1;
+                    }
+                
+                    if (minutes > 59) {
+                        minutes = 0;
+                        hours += 1;
+                    }
+
+                    if (hours > 23) {
+                        hours = 0;
+                    }
+                }
+
+                setInterval(startClock, 1000); 
+            } 
+        }
+        drawClock();
+
+        
+    </script>
+</body>
+</html>
